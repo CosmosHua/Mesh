@@ -1,0 +1,36 @@
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+conda config --set show_channel_urls yes
+
+conda install tensorflow-gpu=1.9
+pip3 install mxnet-cu80 graphviz # conda install mxnet-gpu graphviz
+pip3 install https://download.pytorch.org/whl/cu80/torch-1.0.0-cp36-cp36m-linux_x86_64.whl
+pip3 install torchvision visdom dominate
+pip3 install opencv-python matplotlib
+
+
+# Ref: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
+# Train cycle_gan: # dataset should include: trainA trainB testA testB valA valB
+nohup python train.py --dataroot=./datasets/HRFace --name=HRFace --model=cycle_gan --gpu_ids=1 --save_epoch_freq=1 --continue_train > log &
+nohup python train.py --dataroot=./datasets/IDFace1W4 --name=IDFace4 --model=cycle_gan --gpu_ids=1 --save_epoch_freq=1 --continue_train >log4 &
+nohup python train.py --dataroot=./datasets/FaceX4K --name=FaceX --model=cycle_gan --netG="unet_256" --save_epoch_freq=1 --continue_train >logfx &
+# Test cycle_gan:	python test.py --dataroot=./datasets/HRFace --name=HRFace --model=cycle_gan
+		python test.py --dataroot=./datasets/IDFace1W4 --name=IDFace4 --model=cycle_gan
+		python test.py --dataroot=./datasets/FaceX4K --name=FaceX --model=cycle_gan --netG="unet_256"
+
+
+# Train pix2pix:	nohup python main.py --phase=train > log &
+# Test pix2pix:	python main.py --phase=test
+
+
+# Ref: https://github.com/affinelayer/pix2pix-tensorflow
+# pre-process:	python ../tools/process.py --input_dir=HRFaceA --b_dir=HRFaceB --operation=combine --output_dir=train
+# Train pix2pix-tf:	nohup python ../pix2pix.py --mode=train --output_dir=model --max_epochs=10 --input_dir=train --which_direction=AtoB --display_freq=100 >log &
+# Test pix2pix-tf:	python ../pix2pix.py --mode=test --output_dir=result --input_dir=test --checkpoint=model
+
+
+# Ref: https://github.com/AlfredXiangWu/LightCNN	https://github.com/ericsun99/Shufflenet-v2-Pytorch
+Test LightCNN:	python extract_feature.py --model=LightCNN-29v2 --resume=./LightCNN_29_V2.pth  --img_dir=./test
+

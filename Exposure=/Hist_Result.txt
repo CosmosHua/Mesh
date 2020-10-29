@@ -1,0 +1,2 @@
+ab->norm: 23	error rate=23/(23+83)=21.7%
+norm->ab: 12	error rate=12/(12+57)=17.4%
